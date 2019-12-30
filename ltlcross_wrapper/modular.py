@@ -10,7 +10,7 @@ import sys
 from multiprocessing import Pool
 import subprocess as sp
 
-from ltlcross_runner.runner import LtlcrossRunner
+from ltlcross_wrapper.runner import LtlcrossRunner
 
 
 def _renumber_formula(line, increase):

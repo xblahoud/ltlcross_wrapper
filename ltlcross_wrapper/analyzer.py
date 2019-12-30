@@ -6,7 +6,7 @@ import math
 import pandas as pd
 import spot
 
-from ltlcross_runner.locate_errors import bogus_to_lcr
+from ltlcross_wrapper.locate_errors import bogus_to_lcr
 
 
 def pretty_print(form):
