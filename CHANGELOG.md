@@ -25,5 +25,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     * Interactive scatter plots rendered by [bokeh](https://bokeh.org/) are created using
         `ResAnalyzer.bokeh_scatter_plot(tool1, tool2)`.
 
-[Unreleased]: https://gitlab.com/fandikb/ltlcross-runner/compare/v0.6...HEAD
-[0.5]: https://gitlab.com/fandikb/ltlcross-runner/tags/v0.6
+[Unreleased]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.6...HEAD
+[0.5]: https://github.com/xblahoud/ltlcross_wrapper/tags/v0.6

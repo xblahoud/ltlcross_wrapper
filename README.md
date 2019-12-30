@@ -67,4 +67,5 @@ TODO: Explain ltlcross options
 
 ### Results' Analyzer
 
-See the [usage notebook](Usage.ipynb).
+See the [usage notebook](Usage.ipynb). Currently, bokeh scatter plots do not
+render directly on github so you might consider to [see the notebook on nbviewer](https://nbviewer.jupyter.org/github/xblahoud/ltlcross_wrapper/blob/master/Usage.ipynb)

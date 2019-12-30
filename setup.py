@@ -16,7 +16,7 @@ setup(
     description="Python wrapper around tool ltlcross from Spot library",
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://gitlab.com/fandikb/ltlcross-runner",
+    url="https://github.com/xblahoud/ltlcross_wrapper",
     author="Fanda Blahoudek",
     author_email="fandikb+dev@gmail.com",
     license="MIT",
