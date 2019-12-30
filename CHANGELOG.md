@@ -4,7 +4,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.6] - 2019-12-30
+## [0.6.1] - 2019-12-30
 ### Added
  - Class `Modulizer` splits a big `ltlcross` task into smaller ones, execute the small
     tasks in parallel, and merge the intermediate results into one final `.csv`, `.log`,
@@ -25,5 +25,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     * Interactive scatter plots rendered by [bokeh](https://bokeh.org/) are created using
         `ResAnalyzer.bokeh_scatter_plot(tool1, tool2)`.
 
-[Unreleased]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.6...HEAD
-[0.5]: https://github.com/xblahoud/ltlcross_wrapper/tags/v0.6
+[Unreleased]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/xblahoud/ltlcross_wrapper/tags/v0.6.1
