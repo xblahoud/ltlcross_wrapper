@@ -5,6 +5,7 @@ import csv
 import math
 import os
 import os.path
+import shutil
 import sys
 
 import multiprocessing
@@ -193,8 +194,8 @@ class Modulizer():
                 os.remove(f)
 
         # Delete the content of the tmp_dir
-        for f in os.listdir(self.tmp_dir):
-            os.remove(f"{self.tmp_dir}/{f}")
+        shutil.rmtree(self.tmp_dir)
+        os.mkdir(self.tmp_dir)
 
         self.run(**kwargs)
 
