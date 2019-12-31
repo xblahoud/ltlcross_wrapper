@@ -50,6 +50,10 @@ class ResAnalyzer:
         # Store precomputed minimums among tools
         self.mins = []
 
+        # Highlighting defaults
+        self.light_highlight_color = "#E0FFE0"
+        self.highlight_color = "lightgreen"
+
     def parse_results(self):
         """Parse the ``self.res_file`` and sets the values, automata, and
         form.
@@ -172,7 +176,7 @@ class ResAnalyzer:
             self.values[col, new_col_name] = self.values[col][tool_set].min(axis=1)
         self.values.sort_index(axis=1, level=0, inplace=True)
 
-    def cumulative(self, tool_set=None, col="states"):
+    def cumulative(self, tool_set=None, col="states", highlight=True):
         """Returns table with cumulative numbers of states.
 
          For each tool, sums the values of `col` over formulas
@@ -193,6 +197,8 @@ class ResAnalyzer:
 
         tool_set : list, contains tools from `self.tools`
             Restrict the output to given subset of tools
+        highlight : Bool (default `True`)
+            Highlight the minimal value for each metric
         """
         if tool_set is None:
             tool_set = self.tools
@@ -203,6 +209,8 @@ class ResAnalyzer:
         df = df.unstack(level=0)
         df.columns = df.columns.droplevel()
         df.columns.name = ""
+        if highlight:
+            df = df.style.apply(self._highlight_min, axis=0)
         return df
 
     def smaller_than(self, t1, t2, col='states', **kwargs):
@@ -399,6 +407,7 @@ class ResAnalyzer:
     def cross_compare(self,
                       tool_set=None,
                       total=True,
+                      highlight=True,
                       **kwargs):
                       #include_other=True):
         """Create a "league" table.
@@ -416,6 +425,8 @@ class ResAnalyzer:
         total : Bool
             include the sum of victories of each tool as the last
             column (called `V`)
+        highlight : Bool (default `True`)
+            color proportional amount of each cell by its value
 
         kwargs can contain:
         compare_on : list of metrics to decide victories
@@ -444,6 +455,8 @@ class ResAnalyzer:
             c[tool] = pd.DataFrame(c[tool]).apply(lambda x: count_better(x.name, tool), 1)
         if total:
             c['V'] = c.sum(axis=1)
+        if highlight:
+            c = c.style.bar(color=self.light_highlight_color, vmin=0)
         return c
 
     def min_counts(self, tool_set=None, restrict_tools=False, unique_only=False, col='states', min_name='min(count)'):
@@ -640,3 +653,7 @@ class ResAnalyzer:
         if show:
             bplt.show(p)
         return p
+
+    def _highlight_min(self, s):
+        is_min = s == s.min()
+        return [f'background-color: {self.highlight_color}' if v else '' for v in is_min]

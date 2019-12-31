@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Each process created by `Modulizer` sets an unique value to environment variable
     `LCW_TMP` that can be used in names of temporary files to prevent data races.
  - `Modulizer.delete_intermediate()` removes the directory with partial results
+ - `Analyzer`'s functions `cumulative` and `cross_compare` add visual information
+    about the results by highlighting the cells. For `cumulative`, the best value
+    (tool) is highlighted in each column. In `cross_compare`, cells contain a
+    background bar that is proportional to the cell's value within the given column.
 
 ## [0.6.1] - 2019-12-30
 ### Added
