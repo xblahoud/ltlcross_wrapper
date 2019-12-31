@@ -148,6 +148,10 @@ class Modulizer():
                    self.out_bogus_file)
         m.merge_files()
 
+    def delete_intermediate(self):
+        """Delete directory with intermediate results."""
+        shutil.rmtree(self.tmp_dir)
+
     def run(self, parts=None, processes=None):
         if processes is None:
             processes=self.processes
@@ -193,8 +197,8 @@ class Modulizer():
             if os.path.isfile(f):
                 os.remove(f)
 
-        # Delete the content of the tmp_dir
-        shutil.rmtree(self.tmp_dir)
+        # Delete the the tmp_dir and recreate it
+        self.delete_intermediate()
         os.mkdir(self.tmp_dir)
 
         self.run(**kwargs)

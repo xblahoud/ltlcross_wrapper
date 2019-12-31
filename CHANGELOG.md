@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
  - Each process created by `Modulizer` sets an unique value to environment variable
     `LCW_TMP` that can be used in names of temporary files to prevent data races.
+ - `Modulizer.delete_intermediate()` removes the directory with partial results
 
 ## [0.6.1] - 2019-12-30
 ### Added
