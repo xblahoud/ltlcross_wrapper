@@ -7,7 +7,7 @@ import os
 import os.path
 import sys
 
-from multiprocessing import Pool
+import multiprocessing
 import subprocess as sp
 
 from ltlcross_wrapper.runner import LtlcrossRunner
@@ -129,6 +129,11 @@ class Modulizer():
 
     def run_part(self, part):
         """Run part number `part`"""
+
+        # Set unique temp directories
+        lcpref = f"tmp{multiprocessing.current_process().ident}"
+        os.environ["LCW_TMP"] = lcpref
+
         res_file = self.get_res_name(part)
         form_file = self.get_ltl_name(part)
         r = LtlcrossRunner(self.tools, form_file, res_file)
@@ -150,7 +155,7 @@ class Modulizer():
             self.split_task()
             parts = range(self.chunks)
 
-        with Pool(processes=processes) as pool:
+        with multiprocessing.Pool(processes=processes) as pool:
             pool.map(self.run_part, parts, 1)
 
         self.merge_parts()

@@ -12,7 +12,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="ltlcross_wrapper",
-    version=version,
+    version="0.6.1dev",
     description="Python wrapper around tool ltlcross from Spot library",
     long_description=README,
     long_description_content_type="text/markdown",

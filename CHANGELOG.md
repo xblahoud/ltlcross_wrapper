@@ -3,6 +3,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+ - Each process created by `Modulizer` sets an unique value to environment variable
+    `LCW_TMP` that can be used in names of temporary files to prevent data races.
 
 ## [0.6.1] - 2019-12-30
 ### Added

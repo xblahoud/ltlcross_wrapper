@@ -63,6 +63,28 @@ By default, all intermediate files will be created in directory
 Otherwise, each filename/dirname can be changed by setting `out_res_file`, 
 `out_log_file`, `out_bogus_file`, and `tmp_dir`.
 
+#### Temporary files in ltlcross commands
+Some tools need to read the input from (or store the output in) a
+temporary file that is different from the one that ltlcross expects.
+This file name has to be specified in the command for `ltlcross`. As
+the task will be processed in parallel (unless requested otherwise
+with `processes=1`), we can have a lot of race conditions. For this
+purpose, each process created by the `Modulizer` class set its own
+value into an environment variable called `$LCW_TMP`. You can then
+specify tools with commands like
+
+    "tool1" : ltl2tgba %f > $LCW_TMP.in.hoa && tool1 $LCW_TMP.in.hoa ...
+
+If you are using the batch mode of
+[GOAL](http://goal.im.ntu.edu.tw/wiki/doku.php), you need to specify the
+names of the temporary files in the GOAL command, where the `$LCW_TMP`
+variable will not be expanded. You can, however, use `echo $LCW_TMP`
+in nested shell evaluation inside the GOAL command (enclosed in two \`).
+See an example of complementation performed by GOAL and simplified by
+Spot.
+
+    'piterman': "ltl2tgba -B > $LCW_TMP.in && GOAL/gc batch '$temp = complement -m piterman `echo $LCW_TMP.in`; save -c HOAF $temp `echo $LCW_TMP.out;' && autfilt --small --tgba $LCW_TMP.out > %O
+
 TODO: Explain ltlcross options
 
 ### Results' Analyzer
