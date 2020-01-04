@@ -69,12 +69,14 @@ class Modulizer():
     def __init__(self, tools, formula_file,
                  chunk_size=2, processes=4,
                  name="modular", tmp_dir=None,
-                 out_res_file=None, out_log_file=None, out_bogus_file=None):
+                 out_res_file=None, out_log_file=None, out_bogus_file=None,
+                 **ltlcross_args):
         self.tools = tools
         self.formula_file = formula_file
 
         self.chunk_size = chunk_size
         self.processes = processes
+        self.ltlcross_args = ltlcross_args
 
         # Set the tmp dirs
         self.tmp_dir = f"{name}.parts" if tmp_dir is None else tmp_dir
@@ -134,7 +136,7 @@ class Modulizer():
         res_file = self.get_res_name(part)
         form_file = self.get_ltl_name(part)
         r = LtlcrossRunner(self.tools, form_file, res_file)
-        r.run_ltlcross()
+        r.run_ltlcross(**self.ltlcross_args)
 
     def merge_parts(self):
         """Use merger to merge intermediate results into final ones."""
