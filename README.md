@@ -17,10 +17,11 @@ python3 -m pip install -U ltlcross_wrapper
 ```
 
 ## Usage
-ltlcross_wrapper offers 2 classes:
- * `Modulizer`splits a big `ltlcross` task into smaller ones, execute the small
-    tasks in parallel, and merge the intermediate results into one final `.csv`, `.log`,
-    and `_bogus.ltl` files.
+ltlcross_wrapper offers 3 classes:
+ * `Modulizer` and `GoalModulizer` split a big `ltlcross` task into smaller ones, execute
+    the small tasks in parallel, and merge the intermediate results into one final `.csv`,
+    `.log`, and `_bogus.ltl` files. Always use `GoalModulizer` if one of the compared
+    tools is [GOAL]!
  * `ResAnalyzer` parses the results of `ltlcross`, and implements several functions
     to analyze and visualize the results, mainly in Jupyter notebooks. 
 
@@ -75,15 +76,32 @@ specify tools with commands like
 
     "tool1" : ltl2tgba %f > $LCW_TMP.in.hoa && tool1 $LCW_TMP.in.hoa ...
 
-If you are using the batch mode of
-[GOAL](http://goal.im.ntu.edu.tw/wiki/doku.php), you need to specify the
-names of the temporary files in the GOAL command, where the `$LCW_TMP`
-variable will not be expanded. You can, however, use `echo $LCW_TMP`
-in nested shell evaluation inside the GOAL command (enclosed in two \`).
+### [GOAL] \& GoalModulizer
+Always use `GoalModulizer` instead of `Modulizer` if you need to run
+[GOAL] in parallel. `GoalModulizer` requires additional parameter
+`goal_root` to specify the path to root directory of [GOAL] (contains
+`gc`, `goal`, `boot.properties`). `GoalModulizer` uses a unique binary
+and a unique shadow folder for each process that runs the task.
+The path to the unique binary is stored in environment variable
+`$LCW_GOAL_BIN` which you can use in specification of tools to compare.
+The `goal_root` part of the path should be omitted in the ltlcross
+command specification. Specifying [GOAL] is as simple as
+
+    'my_goal_batch` : '$LCW_GOAL_BIN batch "{goals commands}"'
+
+If you are using the batch mode of [GOAL], you often need to specify the
+names of the temporary files in the [GOAL] command. The `$LCW_TMP` is
+not recognized as a variable inside these commands. Use \`echo $LCW_TMP\`
+which is a nested shell evaluation inside the [GOAL] command (enclosed in two \`).
 See an example of complementation performed by GOAL and simplified by
 Spot.
 
-    'piterman': "ltl2tgba -B > $LCW_TMP.in && GOAL/gc batch '$temp = complement -m piterman `echo $LCW_TMP.in`; save -c HOAF $temp `echo $LCW_TMP.out;' && autfilt --small --tgba $LCW_TMP.out > %O
+    tools = {
+        "piterman": "ltl2tgba -B %f > $LCW_TMP.in && $LCW_GOAL_BIN batch '$temp = complement -m piterman `echo $LCW_TMP.in`; save -c HOAF $temp `echo $LCW_TMP.out;' && autfilt --small --tgba $LCW_TMP.out > %O
+        "SPOT": "ltl2tgba -B %f | autfilt --complement > %O"
+    }
+    m = ltlcross_wrapper.GoalModulizer(goal_root="PATH_TO_GOAL", tools=tools, formula_file="MY_FORMS.ltl")
+    m.run()
 
 TODO: Explain ltlcross options
 
@@ -91,3 +109,5 @@ TODO: Explain ltlcross options
 
 See the [usage notebook](Usage.ipynb). Currently, bokeh scatter plots do not
 render directly on github so you might consider to [see the notebook on nbviewer](https://nbviewer.jupyter.org/github/xblahoud/ltlcross_wrapper/blob/master/Usage.ipynb)
+
+[GOAL]: http://goal.im.ntu.edu.tw

@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Fanda Blahoudek
+# Copyright (c) 2019, 2020 Fanda Blahoudek
 # This file is part of ltlcross_wrapper distributed under MIT License.
 
 import csv
@@ -6,6 +6,7 @@ import math
 import os
 import os.path
 import shutil
+import stat
 import sys
 
 import multiprocessing
@@ -130,11 +131,6 @@ class Modulizer():
 
     def run_part(self, part):
         """Run part number `part`"""
-
-        # Set unique temp directories
-        lcpref = f"tmp{multiprocessing.current_process().ident}"
-        os.environ["LCW_TMP"] = lcpref
-
         res_file = self.get_res_name(part)
         form_file = self.get_ltl_name(part)
         r = LtlcrossRunner(self.tools, form_file, res_file)
@@ -152,16 +148,31 @@ class Modulizer():
         """Delete directory with intermediate results."""
         shutil.rmtree(self.tmp_dir)
 
-    def run(self, parts=None, processes=None):
+    def run(self, parts=None, processes=None, pool=None):
+        """Run all partial tasks and merge them.
+
+        Call `split_task` unless `parts` are specified.
+
+        Parameters
+        ----------
+        parts : iterable of integers (default `None`)
+            Run ltlcross only for chunks in `parts` (or all if `None`)
+        processes : int (default `self.processes`)
+            Number of processes used to compute the intermediate tasks
+        pool : `multiprocessing.Pool` object
+            Use this pool of workers to compute the task. Create new
+            pool otherwise.
+        """
         if processes is None:
-            processes=self.processes
+            processes = self.processes
 
         if parts is None:
             self.split_task()
             parts = range(self.chunks)
 
-        with multiprocessing.Pool(processes=processes) as pool:
-            pool.map(self.run_part, parts, 1)
+        if pool is None:
+            pool = multiprocessing.Pool(processes=processes,initializer=self._set_LCW_TMP)
+        pool.map(self.run_part, parts, 1)
 
         self.merge_parts()
 
@@ -202,6 +213,116 @@ class Modulizer():
         os.mkdir(self.tmp_dir)
 
         self.run(**kwargs)
+
+    def _get_LCW_TMP(self):
+        return f"tmp{multiprocessing.current_process().ident}"
+
+    def _set_LCW_TMP(self):
+        # Set unique temp directories
+        os.environ["LCW_TMP"] = self._get_LCW_TMP()
+
+
+def make_executable(file):
+    """Sets +x permissions to `file`"""
+    st = os.stat(file)
+    os.chmod(file, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+
+
+class GoalModulizer(Modulizer):
+    """Run in parallel ltlcross tasks with GOAL tool.
+
+    GOAL requires a special setup for parallel execution, otherwise
+    different processes can kill each other or modify their data.
+    In addition to Modulizer, you need to specify path to
+    GOAL executables as `goal_root`.
+
+    Each process now uses unique goal binary. Use `$LCW_GOAL_BIN`
+    as goal binary in each GOAL configuration. Do NOT prefix
+    `$LCW_GOAL_BIN` with `goal_root`, otherwise the script fails.
+
+    Copied from `Modulizer`:
+    ========================
+    Split a big ltlcross task into smaller ones that can
+    be executed separately, run them in parallel, and merge
+    the results into one final `.csv` file with results and
+    one `.log` file.
+
+    Expected use:
+    >>> m = Modulizer(parameters)
+    >>> m.run()
+
+    A computation that was interupted can be resumed by:
+    >>> m.resume()
+
+    Delete previous results (final and intermediate), and run
+    again, by:
+    >>> m.recompute()
+
+    Parameters
+    ==========
+     * `tools` : dict — dictionary with tools config passed to LtlcrossRunner
+     * `formula_file` : str — path to file to split
+     * `name` : name of the job
+                used for default names of output files and tmp_dir
+                'modular' by defualt.
+     * `chunk_size` : int — number of formulas in one chunk (default 2)
+     * `tmp_dir` : str — directory to perform (or continue) computations
+     * `processes` : int — # of processes for running ltlcross in parallel
+                     default 4
+     * final output files (all are `{name}.ext` by default):
+       - out_res_file (`.csv`, final results)
+       - out_log_file (`.log`, merged logs)
+       - out_bogus_file (`_bogus.ltl`, merged bogus formulae)
+    """
+    def __init__(self, goal_root, **kwargs):
+        Modulizer.__init__(self, **kwargs)
+        self.goal_root = goal_root
+
+    def _prepare_goal(self):
+        """Process create unique file binaries and working directories
+
+        Also setup the env variables LCW_TMP & LCW_GOAL_BIN.
+        """
+        # Set unique temp directories & goal binaries
+        self._set_LCW_TMP()
+        goal_bin = f"{self.goal_root}/{self._get_LCW_TMP()}-gc"
+        os.environ["LCW_GOAL_BIN"] = goal_bin
+
+        pref = self._get_LCW_TMP()
+        boot_prop_orig = "boot_cmd.properties"
+        boot_prop_new = f"{pref}-boot_cmd.properties"
+        boot_prop_orig_p = f"{self.goal_root}/{boot_prop_orig}"
+        boot_prop_new_p = f"{self.goal_root}/{boot_prop_new}"
+        gc_orig = f"{self.goal_root}/gc"
+        gc_new = goal_bin
+
+        # Setup new jpf_shadow
+        old_props = open(boot_prop_orig_p).read()
+        mod_props = old_props.replace(".jpf-shadow", f"{pref}-jpf-shadow")
+        print(mod_props, file=open(boot_prop_new_p, "w"))
+        # Create the directory (otherwise _clean_goal can crash)
+        os.mkdir(f"{self.goal_root}/{pref}-jpf-shadow")
+
+        # Create new binary that calls new jpf_shadow
+        old_gc = open(gc_orig).read()
+        mod_gc = old_gc.replace(boot_prop_orig, boot_prop_new)
+        print(mod_gc, file=open(gc_new, "w"))
+        make_executable(gc_new)
+
+    def _clean_goal(self, i):
+        """Delete files created on process initialization"""
+        pref = self._get_LCW_TMP()
+        os.remove(f"{self.goal_root}/{pref}-boot_cmd.properties")
+        os.remove(f"{self.goal_root}/{pref}-gc")
+        shutil.rmtree(f"{self.goal_root}/{pref}-jpf-shadow")
+
+    def run(self, **kwargs):
+        processes = kwargs.get("processes",self.processes)
+        pool = multiprocessing.Pool(processes, initializer=self._prepare_goal)
+
+        Modulizer.run(self, pool=pool, **kwargs)
+
+        pool.map(self._clean_goal, range(processes), chunksize=1)
 
 
 class Merger():
