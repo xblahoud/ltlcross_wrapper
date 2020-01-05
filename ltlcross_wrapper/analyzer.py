@@ -19,7 +19,7 @@ def hoa_to_spot(hoa):
 
 
 class ResAnalyzer:
-    """Analyze `.csv` files with results of ltlcross
+    """Analyze `.csv` files with results of ltlcross.
 
     Parameters
     ----------
@@ -27,11 +27,13 @@ class ResAnalyzer:
         filename to store the ltlcross`s results
     cols : list of Strings, default ``['states','edges','transitions','acc']``
         names of ltlcross's statistics columns to be recorded
+    tool_set : default tool_set for which you want to display values
     """
 
     def __init__(self,
                  res_filename,
                  cols=None,
+                 tool_set=None,
                  ):
         self.res_file = res_filename
 
@@ -53,6 +55,10 @@ class ResAnalyzer:
         # Highlighting defaults
         self.light_highlight_color = "#E0FFE0"
         self.highlight_color = "lightgreen"
+
+        self.parse_results()
+
+        self.tool_set = self.tools if tool_set is None else tool_set
 
     def parse_results(self):
         """Parse the ``self.res_file`` and sets the values, automata, and
@@ -201,7 +207,7 @@ class ResAnalyzer:
             Highlight the minimal value for each metric
         """
         if tool_set is None:
-            tool_set = self.tools
+            tool_set = self.tool_set
         data = self.values.loc[:, (col, tool_set)].dropna().sum()
 
         # Format as DataFrame, remove unnecessary index labels
@@ -383,7 +389,7 @@ class ResAnalyzer:
                                  `incorrect`, `crash`, or
                                  'no output'
                   Type of error we seek
-        drop_zeros: Boolean (default True)
+        drop_zeros : Boolean (default True)
                     If true, rows with zeros are removed
         """
         valid_errors = ['timeout', 'parse error',
@@ -449,7 +455,7 @@ class ResAnalyzer:
             #        raise e
 
         if tool_set is None:
-            tool_set = self.tools
+            tool_set = self.tool_set
         c = pd.DataFrame(index=tool_set, columns=tool_set).fillna(0)
         for tool in tool_set:
             c[tool] = pd.DataFrame(c[tool]).apply(lambda x: count_better(x.name, tool), 1)
@@ -461,12 +467,12 @@ class ResAnalyzer:
 
     def min_counts(self, tool_set=None, restrict_tools=False, unique_only=False, col='states', min_name='min(count)'):
         if tool_set is None:
-            tool_set = list(self.tools)
+            tool_set = self.tool_set
         else:
             tool_set = [t for t in tool_set if
                         t in self.tools or
                         t in self.mins]
-        min_tools = tool_set if restrict_tools else list(self.tools)
+        min_tools = tool_set if restrict_tools else self.tools
         self.compute_best(tool_set=min_tools, new_col_name=min_name)
         s = self.values.loc(axis=1)[col]
         df = s.loc(axis=1)[tool_set + [min_name]]

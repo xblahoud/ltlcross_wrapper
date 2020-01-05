@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     about the results by highlighting the cells. For `cumulative`, the best value
     (tool) is highlighted in each column. In `cross_compare`, cells contain a
     background bar that is proportional to the cell's value within the given column.
+ - `ResAnalyzer` now takes argument `tool_set` which is the default set of tools you
+    for which results are shown.
+
+### Changed
+ - `parse_results` is now called from constructor of `ResAnalyzer`.
 
 ## [0.6.1] - 2019-12-30
 ### Added
