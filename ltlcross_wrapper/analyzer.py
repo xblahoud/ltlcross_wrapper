@@ -18,6 +18,62 @@ def hoa_to_spot(hoa):
     return spot.automaton(hoa + "\n")
 
 
+def remove_tools(source, output, tool_set):
+    """Remove data for tool from ltlcross resutls
+
+    Parameters
+    ==========
+    `source`   : str, filename that contains the source data
+    `output`   : str, filename where to write data, will be overwritten
+    `tool_ser` : list, names of tool for which data will be removed
+    """
+    a = ResAnalyzer(source)
+    for tool in a.tools:
+        if tool not in a.tools:
+            raise ValueError(f"{tool} is already not in the data (file {source})")
+
+    data = pd.read_csv(source)
+    data = data.loc[~data["tool"].isin(tool_set)]
+    data.to_csv(output, index=False)
+
+
+def merge(source1, source2, output, tool_set=None):
+    """Merge two files with ltlcross results.
+
+    The 2 files have to contain data for disjoint toolnames. This restriction
+    can be relaxed by specifting `tool_set` such that it does not contain any
+    tool from `source1`.
+
+    Parameters
+    ==========
+    `source1`  : str, filename that contains the base source data
+    `source2`  : str, filename that contains the added source data
+    `output`   : str, filename where to write data, will be overwritten
+    `tool_set` : list of tools from `source2`.
+        Only tools in `tool_set` will be added to those in `source1` if specified
+    """
+    tools1 = ResAnalyzer(source1).tools
+    tools2 = ResAnalyzer(source2).tools
+
+    # is tool_set valid
+    if tool_set is not None:
+        for t in tool_set:
+            if t not in tools2:
+                raise ValueError(f"{t} not a toolname in {source2}")
+    else:
+        tool_set = tools2
+
+    # Disjoint tools?
+    for t in tool_set:
+        if t in tools1:
+            raise ValueError(f"{t} already in {source1}")
+
+    base = pd.read_csv(source1)
+    add = pd.read_csv(source2)
+    add = add.loc[add["tool"].isin(tool_set)]
+    pd.concat([base,add]).to_csv(output)
+
+
 class ResAnalyzer:
     """Analyze `.csv` files with results of ltlcross.
 
