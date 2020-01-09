@@ -56,7 +56,7 @@ class Modulizer():
      * `name` : name of the job
                 used for default names of output files and tmp_dir
                 'modular' by defualt.
-     * `chunk_size` : int — number of formulas in one chunk (default 2)
+     * `chunk_size` : int — number of formulas in one chunk (default 1)
      * `tmp_dir` : str — directory to perform (or continue) computations
      * `processes` : int — # of processes for running ltlcross in parallel
                      default 4
@@ -67,7 +67,7 @@ class Modulizer():
     """
 
     def __init__(self, tools, formula_file,
-                 chunk_size=2, processes=4,
+                 chunk_size=1, processes=4,
                  name="modular", tmp_dir=None,
                  out_res_file=None, out_log_file=None, out_bogus_file=None,
                  **ltlcross_args):
@@ -267,7 +267,7 @@ class GoalModulizer(Modulizer):
      * `name` : name of the job
                 used for default names of output files and tmp_dir
                 'modular' by defualt.
-     * `chunk_size` : int — number of formulas in one chunk (default 2)
+     * `chunk_size` : int — number of formulas in one chunk (default 1)
      * `tmp_dir` : str — directory to perform (or continue) computations
      * `processes` : int — # of processes for running ltlcross in parallel
                      default 4
