@@ -410,32 +410,30 @@ class ResAnalyzer:
             return res.iloc[res.to_numpy().nonzero()]
         return res
 
-    def get_error_counts(self, drop_zeros=True, tool_set=None,
-                         error_types=None):
+    def get_error_counts(self, drop_zeros=True, error_types=None):
         """Return DataFrame with numbers of errors of all types
         for each tool.
 
         Parameters
         ----------
         drop_zeros : Boolean (default True)
-                    If true, rows with zeros are removed
+            If true, show only tools with some errors
         error_types : Iterable of Strings, can contain only following (default all):
             * `timeout`,
             * `parse error`,
             * `incorrect`,
             * `crash`,
             * 'no output'
-        tool_set : iterable of tools (default all)
         """
-        if tool_set is None:
-            tool_set = self.tool_set
         if error_types is None:
             error_types = ['timeout', 'parse error', 'incorrect', 'crash', 'no output']
 
         data = {}
         for t in error_types:
-            data[t] = self._get_error_count(t, drop_zeros)[list(tool_set)]
-        return pd.DataFrame(data)
+            data[t] = self._get_error_count(t, drop_zeros)
+        res = pd.DataFrame(data)
+        return res.fillna(0, downcast="infer")
+
 
     def cross_compare(self,
                       tool_set=None,
