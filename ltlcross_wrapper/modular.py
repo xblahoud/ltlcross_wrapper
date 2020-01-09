@@ -217,7 +217,7 @@ class Modulizer():
         self.run(**kwargs)
 
     def _get_LCW_TMP(self):
-        return f"tmp{multiprocessing.current_process().ident}"
+        return f"lcw-{multiprocessing.current_process().ident}"
 
     def _set_LCW_TMP(self):
         # Set unique temp directories
