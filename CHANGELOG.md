@@ -15,9 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         proportional to the cell's value within the given column.
     - `ResAnalyzer()` now takes argument `tool_set` which is the default set of tools you
         for which results are shown.
-    - `get_error_counts`
-        
- 
+    - `get_error_counts` shows numbers of errors found in the benchmark by categories.
+ * Updating files with results (all can be supplied `tool_set`)
+    - `remove_tools(resfile, tools, output)` removes lines for given `tools` from `resfile`
+        and stores the reduced file in `output`.
+    - `update_resfile(base, new, output)` updates `base` resfile with values from `new`
+        resfile and stores the updated results in `output`.
+    - `merge_resfiles(base, new, output)` merges 2 resfiles into `output`.
 
 ### Changed
  - `parse_results` is now called from constructor of `ResAnalyzer`.

@@ -37,41 +37,86 @@ def remove_tools(source, output, tool_set):
     data.to_csv(output, index=False)
 
 
-def merge(source1, source2, output, tool_set=None):
+def merge_resfiles(base_results, new_results, output, tool_set=None):
     """Merge two files with ltlcross results.
 
     The 2 files have to contain data for disjoint toolnames. This restriction
     can be relaxed by specifting `tool_set` such that it does not contain any
-    tool from `source1`.
+    tool from `base_results`.
 
     Parameters
     ==========
-    `source1`  : str, filename that contains the base source data
-    `source2`  : str, filename that contains the added source data
+    `base_results`  : str, filename that contains the base source data
+    `new_results`  : str, filename that contains the added source data
     `output`   : str, filename where to write data, will be overwritten
-    `tool_set` : list of tools from `source2`.
-        Only tools in `tool_set` will be added to those in `source1` if specified
+    `tool_set` : list of tools from `new_results`.
+        Only tools in `tool_set` will be added to those in `base_results` if specified
     """
-    tools1 = ResAnalyzer(source1).tools
-    tools2 = ResAnalyzer(source2).tools
+    tools1 = ResAnalyzer(base_results).tools
+    tools2 = ResAnalyzer(new_results).tools
 
     # is tool_set valid
     if tool_set is not None:
         for t in tool_set:
             if t not in tools2:
-                raise ValueError(f"{t} not a toolname in {source2}")
+                raise ValueError(f"{t} not a toolname in {new_results}")
     else:
         tool_set = tools2
 
     # Disjoint tools?
     for t in tool_set:
         if t in tools1:
-            raise ValueError(f"{t} already in {source1}")
+            raise ValueError(f"{t} already in {base_results}")
 
-    base = pd.read_csv(source1)
-    add = pd.read_csv(source2)
+    base = pd.read_csv(base_results)
+    add = pd.read_csv(new_results)
     add = add.loc[add["tool"].isin(tool_set)]
-    pd.concat([base,add]).to_csv(output)
+    pd.concat([base,add]).to_csv(output, index=False)
+
+
+def update_resfile(base_results, new_results, output, tool_set=None, add_new_tools=True):
+    """Update ltlcross results in file base by values from new.
+
+    By default, values for tools in `new_results` overwrite the values in
+    `base_results`, and tools not previously in `base_results` are added to
+    the result, unless specifying `add_new_tools=False`.
+
+    `tool_set` controls which data from `new_results` should be used.
+
+    Parameters
+    ==========
+    `base_results` : str, filename that contains the base source data
+    `new_results`  : str, filename that contains the new source data
+    `output`       : str, filename where to write updated data, will be overwritten
+    `tool_set`     : list of tools from `new_results`.
+        Only tools in `tool_set` will be updated/added in/to those in `base_results`
+        By default use all tools from `new_results`.
+    `add_new_tools` : Bool, if `False`, only update values for tools already in
+        `base_results`. Do not add new tools.
+    """
+    tools1 = ResAnalyzer(base_results).tools
+    tools2 = ResAnalyzer(new_results).tools
+
+    # is tool_set valid
+    if tool_set is not None:
+        for t in tool_set:
+            if t not in tools2:
+                raise ValueError(f"{t} not a toolname in {new_results}")
+    else:
+        tool_set = tools2
+
+    shared_tools = [t for t in tool_set if t in tools1]
+    if not add_new_tools:
+        tool_set = shared_tools
+
+    base = pd.read_csv(base_results)
+    base = base.loc[~base["tool"].isin(shared_tools)]
+    add = pd.read_csv(new_results)
+    add = add.loc[add["tool"].isin(tool_set)]
+
+    pd.concat([base, add]).to_csv(output, index=False)
+
+
 
 
 class ResAnalyzer:
