@@ -535,7 +535,6 @@ class ResAnalyzer:
         res = pd.DataFrame(data)
         return res.fillna(0, downcast="infer")
 
-
     def cross_compare(self,
                       tool_set=None,
                       total=True,
@@ -591,23 +590,71 @@ class ResAnalyzer:
             c = c.style.bar(color=self.light_highlight_color, vmin=0)
         return c
 
-    def min_counts(self, tool_set=None, restrict_tools=False, unique_only=False, col='states', min_name='min(count)'):
+    def min_counts(self, tool_set=None,
+                   unique_only="merged",
+                   restrict_tools=True,
+                   col='states',
+                   min_name='min(count)'):
+        """Compute number of cases where each tool produces the minimum automaton.
+
+        Parameters
+        ==========
+         * `tool_set`    : tools to check for values, self.tool_set by default
+         * `unique_only` : `bool` or "both". If `True`, count only unique hits
+                           of the minimum value (such no other tool reached it)
+                           If `"both"`, return values both for unique and
+                           non-unique min hits.
+         * `restrict_tools` : `bool`, default `True`. If `False`, consider also
+                              tools not in `tool_set` for computation of the min
+                              values.
+         * `col` : name of column to use, "states" by default
+         * `min_name` : `str`, default "min(count)"
+                        column name used to store the minimum values for each formula
+        """
+        if unique_only == "both":
+            unique = self.min_counts(tool_set=tool_set, unique_only=True,
+                                     restrict_tools=restrict_tools, col=col,
+                                     min_name=min_name)
+            shared = self.min_counts(tool_set=tool_set , unique_only=False,
+                                     restrict_tools=restrict_tools, col=col,
+                                     min_name=min_name)
+            return pd.merge(unique, shared, how="outer", left_index=True, right_index=True)
+
+        if not isinstance(unique_only, bool):
+            raise ValueError(f'unique_only has to be "both" or `bool`. Given {unique_only}')
+
         if tool_set is None:
             tool_set = self.tool_set
         else:
             tool_set = [t for t in tool_set if
                         t in self.tools or
                         t in self.mins]
+
+        # Compute the minimum over considered tools
         min_tools = tool_set if restrict_tools else self.tools
         self.compute_best(tool_set=min_tools, new_col_name=min_name)
-        s = self.values.loc(axis=1)[col]
-        df = s.loc(axis=1)[tool_set + [min_name]]
-        is_min = lambda x: x[x == x[min_name]]
-        best_t_count = df.apply(is_min, axis=1).count(axis=1)
-        choose = (df[best_t_count == 2]) if unique_only else df
-        choose = choose.index
-        min_counts = df.loc[choose].apply(is_min, axis=1).count()
-        return pd.DataFrame(min_counts[min_counts.index != min_name])
+        vals = self.values.loc(axis=1)[col]
+        df = vals.loc(axis=1)[tool_set + [min_name]]
+
+        def is_min(x):
+            return x[x == x[min_name]]
+
+        # min_hits computes for each formula, how many tools
+        # hits the minimum. NOte that the virtual tool that
+        # always returns the best result is included in the count.
+        min_hits = df.apply(is_min, axis=1).count(axis=1)
+
+        selected_cases = (df[min_hits == 2]) if unique_only else df
+        selected_cases = selected_cases.index
+
+        # Compute how many times each tool matches the minimum value
+        min_counts = df.loc[selected_cases].apply(is_min, axis=1).count()
+
+        # Format the output DataFrame
+        res = pd.DataFrame(min_counts[min_counts.index != min_name])
+        res.index.name = "tool"
+        res.columns = ["unique min hits"] if unique_only else ["min hits"]
+        return res
 
     def get_plot_data(self, tool1, tool2,
                       include_equal=False,

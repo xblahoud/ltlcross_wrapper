@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `ResAnalyzer()` now takes argument `tool_set` which is the default set of tools you
         for which results are shown.
     - `get_error_counts` shows numbers of errors found in the benchmark by categories.
+    - `min_counts` can return counts of both unique and non-unique min-hits with `unique_only="both"`.
  * Updating files with results (all can be supplied `tool_set`)
     - `remove_tools(resfile, tools, output)` removes lines for given `tools` from `resfile`
         and stores the reduced file in `output`.
