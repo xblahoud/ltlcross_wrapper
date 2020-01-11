@@ -591,7 +591,7 @@ class ResAnalyzer:
         return c
 
     def min_counts(self, tool_set=None,
-                   unique_only="merged",
+                   unique_only="both",
                    restrict_tools=True,
                    col='states',
                    min_name='min(count)'):
@@ -603,7 +603,7 @@ class ResAnalyzer:
          * `unique_only` : `bool` or "both". If `True`, count only unique hits
                            of the minimum value (such no other tool reached it)
                            If `"both"`, return values both for unique and
-                           non-unique min hits.
+                           non-unique min hits (default).
          * `restrict_tools` : `bool`, default `True`. If `False`, consider also
                               tools not in `tool_set` for computation of the min
                               values.
