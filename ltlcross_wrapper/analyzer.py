@@ -335,6 +335,15 @@ class ResAnalyzer:
         self.mins.append(new_col_name)
         for col in self.cols:
             self.values[col, new_col_name] = self.values[col][tool_set].min(axis=1)
+
+        # Check if at least one tool finshed ok
+        def check_status(x):
+            for tool in tool_set:
+                if x[tool] == "ok":
+                    return "ok"
+            return pd.np.nan
+        self.exit_status[new_col_name] = self.exit_status.apply(check_status, 1)
+
         self.values.sort_index(axis=1, level=0, inplace=True)
 
     def cumulative(self, tool_set=None, col="states", highlight=True):
