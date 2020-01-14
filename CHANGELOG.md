@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `update_resfile(base, new, output)` updates `base` resfile with values from `new`
         resfile and stores the updated results in `output`.
     - `merge_resfiles(base, new, output)` merges 2 resfiles into `output`.
+ * `gather_cumulative` and `gather_mins` show tables for multiple benchmarks.
 
 ### Changed
  - `parse_results` is now called from constructor of `ResAnalyzer`.

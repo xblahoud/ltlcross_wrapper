@@ -25,7 +25,7 @@ def remove_tools(source, output, tool_set):
     ==========
     `source`   : str, filename that contains the source data
     `output`   : str, filename where to write data, will be overwritten
-    `tool_ser` : list, names of tool for which data will be removed
+    `tool_set` : list, names of tool for which data will be removed
     """
     a = ResAnalyzer(source)
     for tool in a.tools:
@@ -117,6 +117,60 @@ def update_resfile(base_results, new_results, output, tool_set=None, add_new_too
     pd.concat([base, add]).to_csv(output, index=False)
 
 
+def gather_cumulative(benchmarks, transpose=True, **kwargs):
+    """Display cumulative numbers for multiple benchmarks.
+
+    For each benchmark, highlight the best
+
+    `benchmarks` : dict (name : ResAnalyzer)
+    `transpose` : bool, swap tool_set & benchmark names
+                  by default, tool_set are rows, benchmark cols
+    `kwargs` : are passed to ResAnalyzer.cumulative()
+    """
+    data = pd.DataFrame()
+    for (name, b) in benchmarks.items():
+        tmp = pd.DataFrame(b.cumulative(highlight=False, **kwargs))
+        tmp.columns = [name]
+        data = data.append(tmp.transpose())
+    if transpose:
+        return data.transpose().style.apply(highlight_min, axis=0)
+    else:
+        return data.style.apply(highlight_min, axis=1)
+
+
+def gather_mins(benchmarks, transpose=True, **kwargs):
+    """Display numbers of minimal automata in multiple benchmarks.
+
+    Show for how many formulas each tool produces automaton that has
+    the smallest number of states. The minimum ranges over `tool_set`.
+    The number in min hits shows how many times the same size as the
+    smallest automaton was achieved. The number in unique min hits counts
+    only cases where the given tool is the only tool with such a small
+    automaton.
+
+    `benchmarks` : dict (name : ResAnalyzer)
+    `transpose` : bool, swap tool_set & benchmark names
+                  by default, tool_set are rows, benchmark cols
+    `kwargs` : are passed to ResAnalyzer.min_counts()
+    """
+    data = pd.DataFrame()
+    for (name, b) in benchmarks.items():
+        tmp = b.min_counts(**kwargs)
+        tmp.columns = pd.MultiIndex.from_tuples([(name, c) for c in tmp.columns])
+        data = data.append(tmp.transpose(), sort=False).fillna(0)
+    if transpose:
+        return data.transpose().style.apply(highlight_max, axis=0)
+    return data.style.apply(highlight_max, axis=1)
+
+
+def highlight_min(s):
+    is_min = s == s.min()
+    return ['background-color: lightgreen' if v else '' for v in is_min]
+
+
+def highlight_max(s):
+    is_max = s == s.max()
+    return ['background-color: lightgreen' if v else '' for v in is_max]
 
 
 class ResAnalyzer:
@@ -289,12 +343,12 @@ class ResAnalyzer:
          For each tool, sums the values of `col` over formulas
          with no timeout.
 
-         If `tool_subset` is given, use only tools within this
+         If `tool_set` is given, use only tools within this
          subset. Only formulas with timeouts within the subset
-         are removed. The sum of values for `tool_subset` where
+         are removed. The sum of values for `tool_set` where
          all formulas with some timeout are removed run
          ```
-         self.cumulative().loc[tool_subset]
+         self.cumulative().loc[tool_set]
          ```
 
         Parameters
@@ -328,10 +382,10 @@ class ResAnalyzer:
         ----------
         t1 : String
             name of tool for comparison (the better one)
-            must be among tools
+            must be among self.tools
         t2 : String
             name of tool for comparison (the worse one)
-            must be among tools
+            must be among self.tools
         col : String, default ``'states'``
             name of column use for comparison.
 
