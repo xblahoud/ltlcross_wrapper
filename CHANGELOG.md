@@ -3,6 +3,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.7] - 2020-01-23
 ### Added
  * `GoalModulizer` is a new class (inherits from `Modulizer`) that treats some specifics
    of [GOAL](http://goal.im.ntu.edu.tw) for parallel execution. You can still use standard
@@ -53,5 +55,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     * Interactive scatter plots rendered by [bokeh](https://bokeh.org/) are created using
         `ResAnalyzer.bokeh_scatter_plot(tool1, tool2)`.
 
-[Unreleased]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.7...HEAD
+[0.7]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.6.1...v0.7
 [0.6.1]: https://github.com/xblahoud/ltlcross_wrapper/tags/v0.6.1
