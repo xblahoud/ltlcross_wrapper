@@ -4,6 +4,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+ * `GoalModulizer` is a new class (inherits from `Modulizer`) that treats some specifics
+   of [GOAL](http://goal.im.ntu.edu.tw) for parallel execution. You can still use standard
+   `Modulizer` for non-parallel execution.
  * `Modulizer`
     - Each process created by `Modulizer` sets an unique value to environment variable
         `LCW_TMP` that can be used in names of temporary files to prevent data races.
