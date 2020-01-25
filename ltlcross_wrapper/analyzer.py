@@ -4,10 +4,11 @@ import os.path
 import math
 
 import pandas as pd
+import matplotlib.pyplot
+import seaborn
 import spot
 
 from ltlcross_wrapper.locate_errors import bogus_to_lcr
-
 
 def pretty_print(form):
     """Runs Spot to format formulas nicer."""
@@ -117,7 +118,7 @@ def update_resfile(base_results, new_results, output, tool_set=None, add_new_too
     pd.concat([base, add]).to_csv(output, index=False)
 
 
-def gather_cumulative(benchmarks, transpose=True, **kwargs):
+def gather_cumulative(benchmarks, transpose=True, highlight=True, **kwargs):
     """Display cumulative numbers for multiple benchmarks.
 
     For each benchmark, highlight the best
@@ -125,6 +126,8 @@ def gather_cumulative(benchmarks, transpose=True, **kwargs):
     `benchmarks` : dict (name : ResAnalyzer)
     `transpose` : bool, swap tool_set & benchmark names
                   by default, tool_set are rows, benchmark cols
+    `highlight` : bool, if True, highlight the best in each benchmark
+                  `True` by default
     `kwargs` : are passed to ResAnalyzer.cumulative()
     """
     data = pd.DataFrame()
@@ -133,12 +136,16 @@ def gather_cumulative(benchmarks, transpose=True, **kwargs):
         tmp.columns = [name]
         data = data.append(tmp.transpose())
     if transpose:
-        return data.transpose().style.apply(highlight_min, axis=0)
+        if highlight:
+            return data.transpose().style.apply(highlight_min, axis=0)
+        return data.transpose()
     else:
-        return data.style.apply(highlight_min, axis=1)
+        if highlight:
+            return data.style.apply(highlight_min, axis=1)
+        return data
 
 
-def gather_mins(benchmarks, transpose=True, **kwargs):
+def gather_mins(benchmarks, transpose=True, highlight=True, **kwargs):
     """Display numbers of minimal automata in multiple benchmarks.
 
     Show for how many formulas each tool produces automaton that has
@@ -151,6 +158,8 @@ def gather_mins(benchmarks, transpose=True, **kwargs):
     `benchmarks` : dict (name : ResAnalyzer)
     `transpose` : bool, swap tool_set & benchmark names
                   by default, tool_set are rows, benchmark cols
+    `highlight` : bool, if True, highlight the best in each benchmark
+                  `True` by default
     `kwargs` : are passed to ResAnalyzer.min_counts()
     """
     data = pd.DataFrame()
@@ -159,8 +168,12 @@ def gather_mins(benchmarks, transpose=True, **kwargs):
         tmp.columns = pd.MultiIndex.from_tuples([(name, c) for c in tmp.columns])
         data = data.append(tmp.transpose(), sort=False).fillna(0)
     if transpose:
-        return data.transpose().style.apply(highlight_max, axis=0)
-    return data.style.apply(highlight_max, axis=1)
+        if highlight:
+            return data.transpose().style.apply(highlight_max, axis=0)
+        return data.transpose()
+    if highlight:
+        return data.style.apply(highlight_max, axis=1)
+    return data
 
 
 def highlight_min(s):
@@ -753,8 +766,68 @@ class ResAnalyzer:
             to_plot = to_plot.groupby([tool1, tool2]).count().reset_index()
         return to_plot
 
+    def seaborn_scatter_plot(self, tool1, tool2, log=False, **kwargs):
+        """Return (and show) non-interactive scatter plot
+        comparing 2 tools rendered using seaborn.
+
+        Needs matplotlib and seaborn
+
+        Always return the `bokeh.plotting.Figure` instance with the
+        plot. This can be used to further tune the plot.
+
+         `tool1` (axis `x`) and `tool2` (axis `y`)
+
+        Possible kwargs
+        ===============
+        `show` : Bool, indicates, whether or not show the plot (in Jupyter)
+
+        `col` : String
+            name of ltlcross metric to plot, `states` by default
+        `merge_same` : Bool
+            if `True` (default), merge same instances and add colorbar
+            for count, see `add_count` of `self.get_plot_data`.
+        `include_equal` : Bool
+            if `False` (default) do not include formulas with the same
+            values for both tools
+
+        And we have 4 arguments that control the appearance of the plot
+        `palette` : color palette to use if `merge_same` is `True`
+            default : `viridis`
+        `alpha` : alpha of marks
+            default `1` if `merge_same` and `.3` otherwise
+
+        All remaining kwargs are supplied to `seaborn.relplot`
+        """
+        # Get the arguments
+        merge_same = kwargs.pop("merge_same", True)
+        alpha = kwargs.pop("alpha", .8) if merge_same else kwargs.pop("alpha", .3)
+        marker_size = kwargs.pop("marker_size", 10)
+        include_equal = kwargs.pop("include_equal", True)
+        col = kwargs.pop("col", "states")
+        palette = kwargs.pop("palette","viridis")
+
+        # Prepare the data
+        data = self.get_plot_data(tool1, tool2, add_count=merge_same, include_equal=include_equal, col=col)
+
+        # Create the basic plot object
+        seaborn.set_context("notebook", rc={"ms": 130})
+        if merge_same:
+            p = seaborn.relplot(x=tool1, y=tool2, data=data, size="count",alpha=alpha, hue="count", palette=palette, **kwargs)
+        else:
+            p = seaborn.relplot(x=tool1, y=tool2, data=data,alpha=alpha,**kwargs)
+        p.fig.suptitle(f"Numbers of {col}")
+        if log:
+            p.ax.loglog()
+
+        # Add line
+        m = self.get_plot_data(tool1,tool2, add_count=False, include_equal=include_equal).max().max()
+        matplotlib.pyplot.plot([0, m], [0, m], color="gray")
+        return p
+
+
     def bokeh_scatter_plot(self, tool1, tool2, **kwargs):
-        """Return (and show) a scatter plot for 2 tools rendered in bokeh library.
+        """Return (and show) an interactive scatter plot comparing
+         2 tools rendered in bokeh library.
 
         Needs bokeh and colorcet libraries.
 
