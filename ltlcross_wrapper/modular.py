@@ -230,6 +230,13 @@ def make_executable(file):
     os.chmod(file, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
 
+def _clean_goal(pref):
+    """Delete files created on process initialization"""
+    os.remove(f"{pref}-boot_cmd.properties")
+    os.remove(f"{pref}-gc")
+    shutil.rmtree(f"{pref}-jpf-shadow")
+
+
 class GoalModulizer(Modulizer):
     """Run in parallel ltlcross tasks with GOAL tool.
 
@@ -311,12 +318,7 @@ class GoalModulizer(Modulizer):
         print(mod_gc, file=open(gc_new, "w"))
         make_executable(gc_new)
 
-    def _clean_goal(self, i):
-        """Delete files created on process initialization"""
-        pref = self._get_LCW_TMP()
-        os.remove(f"{self.goal_root}/{pref}-boot_cmd.properties")
-        os.remove(f"{self.goal_root}/{pref}-gc")
-        shutil.rmtree(f"{self.goal_root}/{pref}-jpf-shadow")
+        multiprocessing.util.Finalize(None, _clean_goal, [f"{self.goal_root}/{pref}"], exitpriority=10)
 
     def run(self, **kwargs):
         processes = kwargs.get("processes",self.processes)
@@ -324,7 +326,8 @@ class GoalModulizer(Modulizer):
 
         Modulizer.run(self, pool=pool, **kwargs)
 
-        pool.map(self._clean_goal, range(processes), chunksize=1)
+        pool.close()
+        pool.join() # Trigger the finalization functions
 
 
 class Merger():
