@@ -4,6 +4,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2020-04-27
+### Fixed
+ * Finalization of GoalModulizer workers (discussed in [xblahoud/seminator-evaluation#2](xblahoud/seminator-evaluation#2))
+
 ## [0.7] - 2020-01-23
 ### Added
  * `GoalModulizer` is a new class (inherits from `Modulizer`) that treats some specifics
@@ -57,6 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     * Interactive scatter plots rendered by [bokeh](https://bokeh.org/) are created using
         `ResAnalyzer.bokeh_scatter_plot(tool1, tool2)`.
 
-[Unreleased]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.7...HEAD
+[Unreleased]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.7...v0.7.1
 [0.7]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.6.1...v0.7
 [0.6.1]: https://github.com/xblahoud/ltlcross_wrapper/tags/v0.6.1

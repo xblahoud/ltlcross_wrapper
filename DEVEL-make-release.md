@@ -3,6 +3,7 @@
 ## 1. Update version
 Update new version in:
  * [init file](ltlcross_runner/__init__.py)
+ * [setup.py](setup.py)
  * [Changelog](CHANGELOG.md)
  
 ## Synchronize with git
