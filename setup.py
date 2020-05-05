@@ -26,5 +26,12 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
     ],
-    packages=["ltlcross_wrapper"], install_requires=['pandas', 'bokeh', 'colorcet', 'seaborn', 'matplotlib']
+    packages=["ltlcross_wrapper"],
+    install_requires=[
+        'pandas>=0.24',
+        'bokeh',
+        'colorcet',
+        'seaborn',
+        'matplotlib'
+    ]
 )
