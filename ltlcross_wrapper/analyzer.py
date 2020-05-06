@@ -776,6 +776,7 @@ class ResAnalyzer:
         plot. This can be used to further tune the plot.
 
          `tool1` (axis `x`) and `tool2` (axis `y`)
+         `log` : Bool, default `False`
 
         Possible kwargs
         ===============
