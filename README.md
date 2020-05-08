@@ -3,10 +3,11 @@ Python wrapper around the amazing tool `ltlcross` from [Spot](https://spot.lrde.
 The tool compares LTL to automata translators.
 
 ## Requires
-* [Spot](https://spot.lrde.epita.fr/)
 * Python >= 3.6
+* [Spot](https://spot.lrde.epita.fr/)
 * [pandas](https://pandas.pydata.org/) >= 0.24
 * [matplotlib](https://matplotlib.org/), [seaborn](https://seaborn.pydata.org)
+* [pandas2pgfplots](https://github.com/xblahoud/pandas2pgfplots)1
 
 The following libraries are needed for bokeh scatter plots (can be used in Jupyter)
 * [bokeh](https://bokeh.org/) (installs automatically by `pip`)

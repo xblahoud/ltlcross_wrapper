@@ -1,8 +1,13 @@
 # Changelog
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Changelog for the [ltlcross_wrapper] project.
 
 ## [Unreleased]
+### Added
+ * `ResAnalyzer` learned to produce [pgfplots] code for scatter plots and cactus
+   plots using [pandas2pgfplots].
+
+### Fixed
+ * \[installation\] version of Pandas needed is >=0.24
 
 ## [0.7.1] - 2020-04-27
 ### Fixed
@@ -64,4 +69,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [Unreleased]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.7.1...HEAD
 [0.7.1]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.7...v0.7.1
 [0.7]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.6.1...v0.7
-[0.6.1]: https://github.com/xblahoud/ltlcross_wrapper/tags/v0.6.1
+[0.6.1]: https://github.com/xblahoud/ltlcross_wrapper/tree/v0.6.1
+
+[ltlcross_wrapper] https://github.com/xblahoud/ltlcross_wrapper
+[pandas2pgfplots] https://github.com/xblahoud/pandas2pgfplots
+[pgfplots]: http://pgfplots.sourceforge.net/

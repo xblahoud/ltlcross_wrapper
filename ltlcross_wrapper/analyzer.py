@@ -7,6 +7,7 @@ import pandas as pd
 import matplotlib.pyplot
 import seaborn
 import spot
+import pandas2pgfplots
 
 from ltlcross_wrapper.locate_errors import bogus_to_lcr
 
@@ -768,11 +769,11 @@ class ResAnalyzer:
 
     def seaborn_scatter_plot(self, tool1, tool2, log=False, **kwargs):
         """Return (and show) non-interactive scatter plot
-        comparing 2 tools rendered using seaborn.
+        comparing 2 tools rendered using seaborn's relplot.
 
         Needs matplotlib and seaborn
 
-        Always return the `bokeh.plotting.Figure` instance with the
+        Return instance of `seabvorn.axisgrid.FaceGrid` with the
         plot. This can be used to further tune the plot.
 
          `tool1` (axis `x`) and `tool2` (axis `y`)
@@ -969,6 +970,73 @@ class ResAnalyzer:
         if show:
             bplt.show(p)
         return p
+
+    def pgfplots_scatter_plot(self, tool1, tool2, same_by_color=False, count_in_title=False, **kwargs):
+        """Return the pgfplots code for a non-interactive scatter plot
+        comparing `tool1` (x-axis) to `tool2` (y-axis).
+
+        Parameters
+        ===============
+        tool1 : String
+            Toolname for x-axis.
+        tool2 : String
+            Toolname for y-axis.
+        same_by_color : Bool (default False)
+            Use color to indicate number of dots on the same coordinate
+        col : String (default 'states')
+            Name of ltlcross metric to plot.
+        include_equal : Bool (default False)
+            Include formulas with results for both tools (tool1 = tool2)
+            (lie on the diagonal).
+        title : str
+            Title of the plot
+        count_in_title : Bool (default False)
+            Add number of formulas into title. The final title is then
+            ```
+            title (count)
+            ```
+         **kwargs passed to pandas2pgfplots.scatter_plot
+        """
+        df = self.get_plot_data(tool1, tool2, add_count=same_by_color, **kwargs)
+        c = None
+        if "marks_dict" not in kwargs:
+                    kwargs["marks_dict"] = {}
+        if "pgfplotsset_dict" not in kwargs:
+            kwargs["pgfplotsset_dict"] = {}
+        if same_by_color:
+            c = "count"
+            kwargs["colorbar"]=True
+            if "fill opacity" not in kwargs["marks_dict"]:
+                kwargs["marks_dict"]["fill opacity"]= 1
+            if "draw opacity" not in kwargs["marks_dict"]:
+                kwargs["marks_dict"]["draw opacity"] = 0
+        if count_in_title:
+            title = kwargs.pop("title","")
+            count = len(df) if not same_by_color else df['count'].sum()
+            kwargs["title"] = f"{title} ({count})"
+        return self._get_pgfplots_scatter_code(df, c=c, **kwargs)
+
+    def pgfplots_cactus_plot(self, tool_set=None, col="time", **kwargs):
+        """Return the pgfplots code for a non-interactive cactus plot
+        for `tool_set` on given `col`.
+
+        By default compare running times of all considered tools.
+
+        **kwargs are passed to pandas2pgfplots.sorted_plot
+        """
+        if tool_set is None:
+            tool_set = self.tool_set
+        df = self.values.loc[:,col].reindex(axis=1)[tool_set]
+        self._get_pgfplots_cactus_code(df)
+        return self._get_pgfplots_cactus_code(df, **kwargs)
+
+    def _get_pgfplots_scatter_code(self, df, **kwargs):
+        """Dummy function that just calls ltlcross_wrapper.pandas2pgfplots.scatter_plot"""
+        return pandas2pgfplots.scatter(df, **kwargs)
+
+    def _get_pgfplots_cactus_code(self, df, **kwargs):
+        """Dummy function that just calls ltlcross_wrapper.pandas2pgfplots.sorted_plot"""
+        return pandas2pgfplots.cactus(df, **kwargs)
 
     def _highlight_min(self, s):
         is_min = s == s.min()
