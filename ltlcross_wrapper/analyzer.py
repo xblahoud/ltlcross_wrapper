@@ -7,9 +7,9 @@ import pandas as pd
 import matplotlib.pyplot
 import seaborn
 import spot
+import pandas2pgfplots
 
 from ltlcross_wrapper.locate_errors import bogus_to_lcr
-from ltlcross_wrapper import pandas2pgfplots
 
 def pretty_print(form):
     """Runs Spot to format formulas nicer."""
@@ -1013,10 +1013,10 @@ class ResAnalyzer:
             title = kwargs.pop("title","")
             count = len(df) if not same_by_color else df['count'].sum()
             kwargs["title"] = f"{title} ({count})"
-        return self._get_pgfplots_sc_code(df, c=c, **kwargs)
+        return self._get_pgfplots_scatter_code(df, c=c, **kwargs)
 
-    def pgfplots_sorted_plot(self, tool_set=None, col="time", **kwargs):
-        """Return the pgfplots code for a non-interactive sorted plot
+    def pgfplots_cactus_plot(self, tool_set=None, col="time", **kwargs):
+        """Return the pgfplots code for a non-interactive cactus plot
         for `tool_set` on given `col`.
 
         By default compare running times of all considered tools.
@@ -1026,16 +1026,16 @@ class ResAnalyzer:
         if tool_set is None:
             tool_set = self.tool_set
         df = self.values.loc[:,col].reindex(axis=1)[tool_set]
-        self._get_pgfplots_sp_code(df)
-        return self._get_pgfplots_sp_code(df, **kwargs)
+        self._get_pgfplots_cactus_code(df)
+        return self._get_pgfplots_cactus_code(df, **kwargs)
 
-    def _get_pgfplots_sc_code(self, df, **kwargs):
+    def _get_pgfplots_scatter_code(self, df, **kwargs):
         """Dummy function that just calls ltlcross_wrapper.pandas2pgfplots.scatter_plot"""
-        return pandas2pgfplots.scatter_plot(df, **kwargs)
+        return pandas2pgfplots.scatter(df, **kwargs)
 
-    def _get_pgfplots_sp_code(self, df, **kwargs):
+    def _get_pgfplots_cactus_code(self, df, **kwargs):
         """Dummy function that just calls ltlcross_wrapper.pandas2pgfplots.sorted_plot"""
-        return pandas2pgfplots.sorted_plot(df, **kwargs)
+        return pandas2pgfplots.cactus(df, **kwargs)
 
     def _highlight_min(self, s):
         is_min = s == s.min()
