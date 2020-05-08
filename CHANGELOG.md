@@ -74,6 +74,6 @@ Changelog for the [ltlcross_wrapper] project.
 [0.7]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.6.1...v0.7
 [0.6.1]: https://github.com/xblahoud/ltlcross_wrapper/tree/v0.6.1
 
-[ltlcross_wrapper] https://github.com/xblahoud/ltlcross_wrapper
-[pandas2pgfplots] https://github.com/xblahoud/pandas2pgfplots
+[ltlcross_wrapper]: https://github.com/xblahoud/ltlcross_wrapper
+[pandas2pgfplots]: https://github.com/xblahoud/pandas2pgfplots
 [pgfplots]: http://pgfplots.sourceforge.net/
