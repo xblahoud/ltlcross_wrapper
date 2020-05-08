@@ -2,6 +2,8 @@
 Changelog for the [ltlcross_wrapper] project.
 
 ## [Unreleased]
+
+## [0.7.2] — 2020-05-08
 ### Added
  * `ResAnalyzer` learned to produce [pgfplots] code for scatter plots and cactus
    plots using [pandas2pgfplots].
@@ -66,7 +68,8 @@ Changelog for the [ltlcross_wrapper] project.
     * Interactive scatter plots rendered by [bokeh](https://bokeh.org/) are created using
         `ResAnalyzer.bokeh_scatter_plot(tool1, tool2)`.
 
-[Unreleased]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.7.2...HEAD
+[0.7.2]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.7...v0.7.1
 [0.7]: https://github.com/xblahoud/ltlcross_wrapper/compare/v0.6.1...v0.7
 [0.6.1]: https://github.com/xblahoud/ltlcross_wrapper/tree/v0.6.1
