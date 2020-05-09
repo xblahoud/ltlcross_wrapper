@@ -18,3 +18,4 @@ G(!a | X(a | (!a U (!a & !b & X(b & (!a U (!a & !b & X(!a & b))))))))
 G(!a | X(a | (!a U (!a & !b & X(b & (!a U (!a & !b & X(b & (!a U (!a & !b & X(!a & b)))))))))))
 G(a | X(!a | ((a | X!a) U (!b & Xb))))
 XG(a | b | Gc | X(c U (b & c)))
+Ga & F!a
