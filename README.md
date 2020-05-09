@@ -7,7 +7,7 @@ The tool compares LTL to automata translators.
 * [Spot](https://spot.lrde.epita.fr/)
 * [pandas](https://pandas.pydata.org/) >= 0.24
 * [matplotlib](https://matplotlib.org/), [seaborn](https://seaborn.pydata.org)
-* [pandas2pgfplots](https://github.com/xblahoud/pandas2pgfplots)1
+* [pandas2pgfplots](https://github.com/xblahoud/pandas2pgfplots)
 
 The following libraries are needed for bokeh scatter plots (can be used in Jupyter)
 * [bokeh](https://bokeh.org/) (installs automatically by `pip`)
