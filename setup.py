@@ -28,7 +28,7 @@ setup(
     ],
     packages=["ltlcross_wrapper"],
     install_requires=[
-        'pandas>=0.24',
+        'pandas>=1.0.3',
         'bokeh',
         'colorcet',
         'seaborn',

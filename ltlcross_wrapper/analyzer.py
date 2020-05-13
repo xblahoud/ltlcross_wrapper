@@ -734,7 +734,7 @@ class ResAnalyzer:
         return res
 
     def get_plot_data(self, tool1, tool2,
-                      include_equal=False,
+                      include_equal=True,
                       col="states",
                       add_count=True,
                       **kwargs):
@@ -743,8 +743,8 @@ class ResAnalyzer:
         `tool1`, `tool2` : tools to plot
         Optional arguments
         ==================
-        `include_equal` : Bool
-            if `False` (default) do not include formulas with the same
+        `include_equal` : Bool (default True)
+            if `False` do not include formulas with the same
             values for both tools
         `col` : String
             name of ltlcross metric to plot, `states` by default
@@ -788,8 +788,8 @@ class ResAnalyzer:
         `merge_same` : Bool
             if `True` (default), merge same instances and add colorbar
             for count, see `add_count` of `self.get_plot_data`.
-        `include_equal` : Bool
-            if `False` (default) do not include formulas with the same
+        `include_equal` : Bool (default True)
+            if `False` do not include formulas with the same
             values for both tools
 
         And we have 4 arguments that control the appearance of the plot
@@ -849,8 +849,8 @@ class ResAnalyzer:
         `merge_same` : Bool
             if `True` (default), merge same instances and add colorbar
             for count, see `add_count` of `self.get_plot_data`.
-        `include_equal` : Bool
-            if `False` (default) do not include formulas with the same
+        `include_equal` : Bool (default True)
+            if `False` do not include formulas with the same
             values for both tools
 
         And we have 4 arguments that control the appearance of the plot
@@ -874,7 +874,7 @@ class ResAnalyzer:
         alpha = kwargs.pop("alpha", 1) if merge_same else kwargs.pop("alpha", .3)
         marker_size = kwargs.pop("marker_size", 10)
         show = kwargs.pop("show", True)
-        include_equal = kwargs.pop("include_equal", False)
+        include_equal = kwargs.pop("include_equal", True)
         col = kwargs.pop("col", "states")
         # Import colorcet for palette
         if merge_same:
@@ -985,7 +985,7 @@ class ResAnalyzer:
             Use color to indicate number of dots on the same coordinate
         col : String (default 'states')
             Name of ltlcross metric to plot.
-        include_equal : Bool (default False)
+        include_equal : Bool (default True)
             Include formulas with results for both tools (tool1 = tool2)
             (lie on the diagonal).
         title : str

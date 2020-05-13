@@ -3,6 +3,14 @@ Changelog for the [ltlcross_wrapper] project.
 
 ## [Unreleased]
 
+## [0.7.2] — 2020-05-13
+### Changed
+ * scatter plots now contain the diagonal cases by default
+
+### Fixed
+ * `pgfplots_scatter_plot` would create incorrect TikZ code when `col` or
+ `include_equal` supplied
+
 ## [0.7.2] — 2020-05-08
 ### Added
  * `ResAnalyzer` learned to produce [pgfplots] code for scatter plots and cactus
