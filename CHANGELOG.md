@@ -3,7 +3,7 @@ Changelog for the [ltlcross_wrapper] project.
 
 ## [Unreleased]
 
-## [0.7.2] — 2020-05-13
+## [0.7.3] — 2020-05-13
 ### Changed
  * scatter plots now contain the diagonal cases by default
 
