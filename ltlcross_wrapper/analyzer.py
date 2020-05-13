@@ -997,7 +997,13 @@ class ResAnalyzer:
             ```
          **kwargs passed to pandas2pgfplots.scatter_plot
         """
+        kw_to_remove = ["include_equal", "col"]
         df = self.get_plot_data(tool1, tool2, add_count=same_by_color, **kwargs)
+
+        # Remove keys for get_plot_data from **kwargs
+        for key in kw_to_remove:
+            kwargs.pop(key, None)
+
         c = None
         if "marks_dict" not in kwargs:
                     kwargs["marks_dict"] = {}
