@@ -33,6 +33,6 @@ setup(
         'colorcet',
         'seaborn',
         'matplotlib',
-        'pandas2pgfplots',
+        'pandas2pgfplots>=0.2.0',
     ]
 )
